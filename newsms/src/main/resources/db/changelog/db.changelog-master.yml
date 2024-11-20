@@ -1,0 +1,103 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: init_schema_1
+      author: eugene
+      changes:
+        - sql:
+            sql: CREATE SCHEMA IF NOT EXISTS app;
+
+  - changeSet:
+      id: init_table_news_1
+      author: eugene
+      preConditions:
+        - not:
+            tableExists:
+              tableName: app.news
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_news
+                  name: id
+                  type: UUID
+              - column:
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  name: text
+                  type: VARCHAR(255)
+              - column:
+                  name: author_id
+                  type: UUID
+              - column:
+                  name: author_username
+                  type: VARCHAR(255)
+            tableName: news
+            schemaName: app
+
+  - changeSet:
+      id: init_table_comments_1
+      author: eugene
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      preConditions:
+        - not:
+            tableExists:
+              tableName: comments
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_comments
+                  name: id
+                  type: UUID
+              - column:
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: news_id
+                  type: UUID
+              - column:
+                  name: text
+                  type: VARCHAR(255)
+              - column:
+                  name: author_id
+                  type: UUID
+              - column:
+                  name: author_username
+                  type: VARCHAR(255)
+            tableName: comments
+            schemaName: app
+
+  - changeSet:
+      id: add_relation_on_news_table
+      author: eugene
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: news_id
+            baseTableName: comments
+            constraintName: FK_COMMENTS_ON_NEWS
+            referencedColumnNames: id
+            referencedTableName: news
+
+
+
+
+

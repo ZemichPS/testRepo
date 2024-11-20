@@ -1,0 +1,5 @@
+FROM openjdk:21-bookworm
+WORKDIR /app
+COPY build/libs/*.jar /app/discovery-application.jar
+EXPOSE 8761
+CMD ["java", "-jar", "discovery-application.jar"]

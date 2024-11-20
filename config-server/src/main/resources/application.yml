@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: configserver
+
+  cloud:
+    config:
+      discovery:
+        service-id: configserver
+      server:
+        git:
+          uri: https://github.com/ZemichPS/news-application-config
+          skipSslValidation: true
+          force-pull: true
+          ignore-local-ssh-settings: true
+eureka:
+  client:
+    healthcheck:
+      enabled: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: false
+
+encrypt:
+  key: ${ENCRYPT_KEY:secret}
+
+server:
+  port: 8888

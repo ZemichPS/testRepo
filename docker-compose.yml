@@ -1,0 +1,99 @@
+version: "3.7"
+
+services:
+
+  service-discovery:
+    container_name: service-discovery
+    image: service-discovery:latest
+    restart: always
+    ports:
+      - "8761:8761"
+    networks:
+      - news-system
+
+  server-config:
+    container_name: config-server
+    image: config-server
+    restart: always
+    depends_on:
+      - service-discovery
+    ports:
+      - "8888:8888"
+    networks:
+      - news-system
+
+  user-service:
+    container_name: user-service
+    image: user-service
+    ports:
+      - "58231:58231"
+    depends_on:
+      - service-discovery
+      - server-config
+      - usersdb
+    networks:
+      - news-system
+
+  news-service:
+    container_name: news-service
+    image: news-service
+    ports:
+      - "64102:64102"
+    depends_on:
+      - user-service
+      - server-config
+      - service-discovery
+      - elastic
+      - newsdb
+      - cache
+    networks:
+      - news-system
+
+  usersdb:
+    container_name: users_db
+    image: postgres:latest
+    restart: always
+    ports:
+      - "5435:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    env_file:
+      - .env.production
+
+  newsdb:
+    container_name: newsdb
+    image: postgres:latest
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    env_file:
+      - .env.production
+
+  cache:
+    container_name: redis-cache
+    image: redis:8.0-M02-alpine
+    ports:
+      - "6379:6379"
+
+  elastic:
+    container_name: full-text-search-elasticsearch
+    image: elasticsearch:7.17.25
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=elastic
+      - ELASTIC_USERNAME=elastic
+
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+networks:
+  news-system:
+    driver: bridge
+
+
+
+
